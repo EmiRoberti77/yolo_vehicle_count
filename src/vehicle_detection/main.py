@@ -6,6 +6,8 @@ VIDEO_WINDOW = "Video"
 model = YOLO("yolo11n.pt")
 cap = cv2.VideoCapture("../videos/cars_highway.mp4")
 car_count = 0
+seen_ids = set()
+
 
 def update_car_counter_label(frame):
   global car_count
@@ -13,17 +15,22 @@ def update_car_counter_label(frame):
 
 def detected_frame(frame, display_frame=True):
   global car_count
-  results = model(frame)[0]
+  global seen_ids
+  results = model.track(frame, persist=True, tracker="bytetrack.yaml")[0]
   for box in results.boxes:
     cls_id = int(box.cls[0])
     class_name = model.names[cls_id]
 
     # Only increment count for car
     if class_name == CAR:
-      car_count += 1
+      car_id = int(box.id[0]) if box.id is not None else None
+      if car_id and car_id not in seen_ids:
+        seen_ids.add(car_id)
+        car_count += 1
+
       x1, y1, x2, y2 = map(int, box.xyxy[0])
       cv2.rectangle(frame, (x1, y1), (x2,y2), (0, 255, 0), 2)
-      cv2.putText(frame, class_name, (x1, y1 - 10), cv2.FONT_HERSHEY_PLAIN, 0.8, (0,255,0),2)
+      cv2.putText(frame, f"{class_name}:{car_id}", (x1, y1 - 10), cv2.FONT_HERSHEY_PLAIN, 0.8, (0,255,0),2)
       update_car_counter_label(frame)
    
   
