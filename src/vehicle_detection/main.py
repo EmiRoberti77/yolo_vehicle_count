@@ -6,6 +6,8 @@ from inference.ObjectDetection import ObjectDetection
 import threading
 from multiprocessing import Process
 import multiprocessing
+from embedding.ObjectEmbedding import ObjectEmbedding
+from context.ObjectContext import ObjectContext
 
 models = ["yolo11n.pt"]
 
@@ -47,7 +49,7 @@ def process(path, title, index):
   # cap.set(cv2.CAP_PROP_FPS, 1)
   cap.set(cv2.CAP_PROP_FRAME_WIDTH, 416)
   cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
-  objDetection = ObjectDetection(models[0], title, True)
+  objDetection = ObjectDetection(models[0], title, True) 
   frame_count = 0
 
   order_video_windows(title=title, position=index)
@@ -62,6 +64,10 @@ def process(path, title, index):
       continue # skip frames
 
     _ = objDetection.track(frame)
+    embedding, auto_context = ObjectEmbedding.embed_frame_with_auto_context(frame)
+    context = ObjectContext.describe_scene(frame)
+    print(auto_context)
+    print(context)
     
     key = cv2.waitKey(10)
     if key == ord('q'):
@@ -72,9 +78,9 @@ def process(path, title, index):
   cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-  multiprocessing.set_start_method("spawn") # mac use
+  multiprocessing.set_start_method("spawn", force=True) # mac use
   processes = []
-  for i in range(16):
+  for i in range(1):
     print("process", i)
     p = Process(target=process, args=('../videos/cars_highway.mp4', f"video-{i}", i))
     processes.append(p)

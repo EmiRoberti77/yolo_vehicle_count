@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["bytetrack", "imshow", "sessionmaker", "ultralytics", "YOLO"]
+  "cSpell.words": [
+    "bytetrack",
+    "fromarray",
+    "imshow",
+    "sessionmaker",
+    "ultralytics",
+    "YOLO"
+  ]
 }

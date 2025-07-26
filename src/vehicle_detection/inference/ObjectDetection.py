@@ -30,7 +30,7 @@ class ObjectDetection(BaseDetection):
   
   def track(self, frame, persist=True, tracker='bytetrack.yaml'):
     frame = cv2.resize(frame, (416, 240))
-    results = self.model.track(frame, persist=persist, tracker=tracker)[0]
+    results = self.model.track(frame, persist=persist, tracker=tracker, verbose=False)[0]
     for box in results.boxes:
       cls_id = int(box.cls[0])
       class_name = self.model.names[cls_id]
